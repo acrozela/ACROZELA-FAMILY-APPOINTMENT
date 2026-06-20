@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ACROZELA Family Appointment Tool - Professional management with WhatsApp integration and Indian Currency support.">
+    <title>ACROZELA FAMILY APPOINTMENT</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --border: #e2e8f0;
+            --success: #16a34a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
+
+        header { background: var(--bg-card); padding: 1.5rem; border-bottom: 1px solid var(--border); text-align: center; }
+        header h1 { font-weight: 800; letter-spacing: 1px; color: var(--primary); font-size: 1.5rem; }
+
+        .container { flex: 1; width: 100%; max-width: 1300px; margin: 1.5rem auto; padding: 0 1rem; display: grid; grid-template-columns: 380px 1fr; gap: 1.5rem; }
+
+        /* Setup Bar */
+        .setup-bar { grid-column: 1 / -1; background: #eff6ff; border: 1px solid #dbeafe; padding: 1.5rem; border-radius: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: flex-end; }
+        .setup-bar h2 { grid-column: 1 / -1; font-size: 0.9rem; color: var(--primary); letter-spacing: 1px; margin-bottom: 0.5rem; }
+
+        /* General Card Styles */
+        .card { background: var(--bg-card); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 1.2rem; color: var(--text-main); border-left: 4px solid var(--primary); padding-left: 12px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--secondary); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.7rem; border: 1px solid var(--border); border-radius: 6px; outline: none; font-size: 0.9rem; background: white; }
+        
+        .btn { width: 100%; padding: 0.8rem; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.2s; text-transform: uppercase; font-size: 0.85rem; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-excel { background: #1d6f42; color: white; width: auto; padding: 0.5rem 1rem; font-size: 0.7rem; }
+        .btn:hover { opacity: 0.9; }
+
+        /* Dashboard Table */
+        .dashboard { display: flex; flex-direction: column; min-height: 400px; }
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th { background: #f1f5f9; padding: 1rem; text-align: left; font-size: 0.75rem; color: var(--secondary); text-transform: uppercase; }
+        td { padding: 1rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+
+        .empty-dashboard { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--secondary); padding: 4rem; text-align: center; }
+        .booking-id { font-family: monospace; font-weight: 700; color: var(--primary); background: #f0f4ff; padding: 2px 6px; border-radius: 4px; }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border); padding: 2rem; text-align: center; margin-top: 2rem; }
+        footer p { font-size: 0.8rem; color: var(--secondary); font-weight: 700; letter-spacing: 1px; margin-bottom: 5px; }
+
+        @media (max-width: 1024px) { .container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ACROZELA FAMILY APPOINTMENT</h1>
+    </header>
+
+    <div class="container">
+        <!-- Business Setup (User must fill to update system) -->
+        <section class="setup-bar">
+            <h2>BUSINESS SETUP (ONE-TIME SAVE)</h2>
+            <div class="form-group">
+                <label>OWNER NAME</label>
+                <input type="text" id="ownerName" placeholder="Enter Owner Name">
+            </div>
+            <div class="form-group">
+                <label>APPOINTMENT STAFF</label>
+                <input type="text" id="staffName" placeholder="Staff Name">
+            </div>
+            <div class="form-group">
+                <label>BUSINESS PHONE</label>
+                <input type="text" id="bizPhone" placeholder="Enter Phone">
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">SAVE SETTINGS</button>
+        </section>
+
+        <!-- Booking Form -->
+        <aside>
+            <div class="card">
+                <div class="card-title">Book Appointment</div>
+                <form id="appForm">
+                    <div class="form-group">
+                        <label>CLIENT NAME</label>
+                        <input type="text" id="cName" required placeholder="Full Name">
+                    </div>
+                    <div class="form-group">
+                        <label>CLIENT PHONE NO</label>
+                        <input type="tel" id="cPhone" required placeholder="Phone Number">
+                    </div>
+                    <div class="form-group">
+                        <label>ADDRESS</label>
+                        <textarea id="cAddress" rows="2" required placeholder="Full Address"></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div class="form-group">
+                            <label>DATE</label>
+                            <input type="date" id="appDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>FEES (INR)</label>
+                            <input type="number" id="appFees" placeholder="₹" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>SERVICE</label>
+                        <select id="appService" required>
+                            <option value="">Select Service</option>
+                            <option>General Health Checkup</option>
+                            <option>Dental Consultation</option>
+                            <option>Eye Examination</option>
+                            <option>Physiotherapy Session</option>
+                            <option>Legal Advisory</option>
+                            <option>Tax Consultation</option>
+                            <option>Financial Audit</option>
+                            <option>Property Maintenance</option>
+                            <option>Plumbing Service</option>
+                            <option>Electrical Repair</option>
+                            <option>AC & HVAC Servicing</option>
+                            <option>Home Cleaning</option>
+                            <option>Pest Control</option>
+                            <option>Interior Styling</option>
+                            <option>Gardening & Landscaping</option>
+                            <option>Child Education Counseling</option>
+                            <option>Career Mentorship</option>
+                            <option>Yoga & Wellness</option>
+                            <option>Nutritionist Plan</option>
+                            <option>Mental Health Therapy</option>
+                            <option>IT & Technical Support</option>
+                            <option>Car Maintenance</option>
+                            <option>Travel & Visa Logistics</option>
+                            <option>Event Coordination</option>
+                            <option>Security System Audit</option>
+                            <option>Insurance Verification</option>
+                            <option>Notary Public Service</option>
+                            <option>Architecture Planning</option>
+                            <option>Software Consultation</option>
+                            <option>Other Family Support</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">GENERATE APPOINTMENT</button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- DASHBOARD (FULLY EMPTY BY DEFAULT) -->
+        <main class="card dashboard">
+            <div class="card-title">
+                DASHBOARD
+                <button class="btn btn-excel" onclick="exportToExcel()">EXPORT TO EXCEL</button>
+            </div>
+            <div id="dashboardContent">
+                <div class="empty-dashboard" id="emptyState">
+                    <p>DASHBOARD IS CURRENTLY EMPTY</p>
+                    <small>No user data found. Please save Business Settings and book an appointment.</small>
+                </div>
+                <div class="table-responsive">
+                    <table id="appTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Client Details</th>
+                                <th>Service & Date</th>
+                                <th>Fees</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>ACROZELA FAMILY APPOINTMENT TOOL</p>
+        <p>DEVELOPED BY ACROZELA TECH</p>
+    </footer>
+
+    <script>
+        // Start with Empty Array
+        let appointments = JSON.parse(localStorage.getItem('acrozela_appointments')) || [];
+        let bookingCounter = parseInt(localStorage.getItem('acrozela_counter')) || 1;
+
+        window.onload = () => {
+            const savedConfig = JSON.parse(localStorage.getItem('acrozela_config'));
+            if(savedConfig) {
+                document.getElementById('ownerName').value = savedConfig.owner || "";
+                document.getElementById('staffName').value = savedConfig.staff || "";
+                document.getElementById('bizPhone').value = savedConfig.phone || "";
+            }
+            // Dashboard remains empty unless user has data in localStorage
+            renderTable();
+        };
+
+        function saveSettings() {
+            const owner = document.getElementById('ownerName').value.trim();
+            const staff = document.getElementById('staffName').value.trim();
+            const phone = document.getElementById('bizPhone').value.trim();
+
+            if(!owner || !staff) {
+                alert("PLEASE ENTER OWNER AND STAFF NAME TO INITIALIZE");
+                return;
+            }
+
+            const config = {
+                owner: owner.toUpperCase(),
+                staff: staff.toUpperCase(),
+                phone: phone
+            };
+            localStorage.setItem('acrozela_config', JSON.stringify(config));
+            alert('BUSINESS SETTINGS UPDATED SUCCESSFULLY');
+        }
+
+        // Logic: YYYYDDNNNN
+        function generateBookingID() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const dd = String(now.getDate()).padStart(2, '0');
+            const nnnn = String(bookingCounter).padStart(4, '0');
+            return `${yyyy}${dd}${nnnn}`;
+        }
+
+        document.getElementById('appForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const config = JSON.parse(localStorage.getItem('acrozela_config'));
+            if(!config || !config.owner) {
+                alert('ERROR: SETUP BUSINESS PROFILE FIRST (OWNER/STAFF)');
+                return;
+            }
+
+            const appointment = {
+                id: generateBookingID(),
+                name: document.getElementById('cName').value,
+                phone: document.getElementById('cPhone').value,
+                address: document.getElementById('cAddress').value,
+                date: document.getElementById('appDate').value,
+                fees: document.getElementById('appFees').value,
+                service: document.getElementById('appService').value,
+                owner: config.owner,
+                staff: config.staff
+            };
+
+            appointments.push(appointment);
+            bookingCounter++;
+            
+            // Save local update
+            localStorage.setItem('acrozela_appointments', JSON.stringify(appointments));
+            localStorage.setItem('acrozela_counter', bookingCounter);
+            
+            renderTable();
+            e.target.reset();
+        });
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const table = document.getElementById('appTable');
+            const empty = document.getElementById('emptyState');
+            
+            if(appointments.length > 0) {
+                empty.style.display = 'none';
+                table.style.display = 'table';
+                tbody.innerHTML = '';
+                
+                appointments.forEach((item, index) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><span class="booking-id">${item.id}</span></td>
+                            <td>
+                                <strong>${(item.name || "").toUpperCase()}</strong><br>
+                                <small>${item.phone || ""}</small><br>
+                                <small style="color:var(--secondary)">${item.address || ""}</small>
+                            </td>
+                            <td>
+                                <strong>${item.service}</strong><br>
+                                ${item.date}
+                            </td>
+                            <td style="font-weight:700">₹${parseFloat(item.fees || 0).toLocaleString('en-IN')}</td>
+                            <td>
+                                <button class="btn btn-success" style="padding:5px; font-size:10px" onclick="sendWhatsApp(${index})">WHATSAPP</button>
+                                <button class="btn" style="color:red; font-size:10px; margin-top:5px" onclick="deleteItem(${index})">REMOVE</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                empty.style.display = 'flex';
+                table.style.display = 'none';
+            }
+        }
+
+        function exportToExcel() {
+            if(appointments.length === 0) {
+                alert("NO DATA AVAILABLE TO EXPORT");
+                return;
+            }
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Booking ID,Client Name,Phone,Address,Service,Date,Fees,Staff,Owner\n";
+            
+            appointments.forEach(row => {
+                const r = [row.id, row.name, row.phone, `"${row.address}"`, row.service, row.date, row.fees, row.staff, row.owner];
+                csvContent += r.join(",") + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "ACROZELA_RECORDS.csv");
+            document.body.appendChild(link);
+            link.click();
+        }
+
+        function sendWhatsApp(index) {
+            const item = appointments[index];
+            const msg = `*APPOINTMENT CONFIRMED*%0A%0A` +
+                        `*Booking ID:* ${item.id}%0A` +
+                        `*Name:* ${item.name.toUpperCase()}%0A` +
+                        `*Service:* ${item.service}%0A` +
+                        `*Date:* ${item.date}%0A` +
+                        `*Fees:* ₹${item.fees}%0A%0A` +
+                        `*Staff:* ${item.staff}%0A` +
+                        `Powered by ACROZELA TECH`;
+            window.open(`https://wa.me/${item.phone}?text=${msg}`, '_blank');
+        }
+
+        function deleteItem(index) {
+            if(confirm("DELETE THIS APPOINTMENT?")) {
+                appointments.splice(index, 1);
+                localStorage.setItem('acrozela_appointments', JSON.stringify(appointments));
+                renderTable();
+            }
+        }
+    </script>
+</body>
+</html>
